@@ -249,6 +249,31 @@ function drawStroke(strokeObj) {
     tool.lineTo(strokeObj.X, strokeObj.Y)
     tool.stroke()
 }
+
+canvas.ontouchstart = (e) => {
+  mouseMove = true
+  const data ={
+      X: e.clientX,
+      Y: e.clientY
+  }
+    socket.emit("beginPath",data)
+}
+canvas.ontouchmove = (e) => {
+  if (mouseMove) {
+      const data = {
+          X: e.clientX,
+          Y: e.clientY,
+          color : !eraserMenu ? eraserColor: penColor,
+          width : !eraserMenu ? eraserSize: pencilSize
+      }
+      socket.emit("drawStroke",data)
+  }
+}
+canvas.ontouchend = (e) => {
+  mouseMove = false;
+  UndoRedoTracker.push(canvas.toDataURL())
+  track = UndoRedoTracker.length - 1
+}
 canvas.onmousedown = (e) => {
     mouseMove = true
     const data ={
